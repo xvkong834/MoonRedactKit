@@ -111,3 +111,20 @@ test "json exports key metrics" {
     .contains("\"gate\":\"ci\""),
   )
 }
+
+///|
+test "default templates expose event rules and gates" {
+  assert_eq(default_event_rules().length(), 5)
+  assert_eq(ci_secret_gate().name, "ci-secret-gate")
+  assert_eq(log_redaction_policy().name, "logs")
+}
+
+///|
+test "audit lines explain clean and blocked results" {
+  let clean = explain_result(redact_text("hello", RedactPolicy::strict()))
+  assert_eq(clean[0].code, "clean")
+  let result = redact_text("password=abcdef123456789", RedactPolicy::strict())
+  let gate = evaluate_gate(ci_secret_gate(), result)
+  assert_eq(explain_gate(gate).code, "block")
+  assert_true(explain_result(result).length() > 1)
+}
