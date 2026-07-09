@@ -1,0 +1,220 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "xvkong834/moonredactkit"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn apply_mask(SensitiveMatch, RedactRule) -> String
+
+pub fn clamp_bp(Int) -> Int
+
+pub fn detect_all(String) -> Array[SensitiveMatch]
+
+pub fn detect_with_config(String, DetectorConfig) -> Array[SensitiveMatch]
+
+pub fn evaluate_fields(Array[FieldValue], Array[FieldRule], RedactPolicy) -> Array[FieldFinding]
+
+pub fn evaluate_gate(LeakGate, RedactResult) -> GateResult
+
+pub fn is_alpha_char(Char) -> Bool
+
+pub fn is_boundary(String, Int) -> Bool
+
+pub fn is_digit_char(Char) -> Bool
+
+pub fn is_hex_char(Char) -> Bool
+
+pub fn is_phone_separator(Char) -> Bool
+
+pub fn is_word_char(Char) -> Bool
+
+pub fn mask_keep_edges(String, Int, Int, String) -> String
+
+pub fn max_int(Int, Int) -> Int
+
+pub fn min_int(Int, Int) -> Int
+
+pub fn missing_required_fields(Array[FieldFinding]) -> Int
+
+pub fn redact_matches(String, RedactPolicy, Array[SensitiveMatch]) -> RedactResult
+
+pub fn redact_text(String, RedactPolicy) -> RedactResult
+
+pub fn repeat_mask(Int, String) -> String
+
+pub fn run_batch(Array[RedactJob], RedactPolicy, LeakGate) -> BatchReport
+
+pub fn stable_fingerprint(String) -> Int
+
+pub fn substring(String, Int, Int) -> String
+
+pub fn summarize_matches(Array[SensitiveMatch]) -> RedactSummary
+
+// Errors
+
+// Types and methods
+pub(all) struct BatchReport {
+  jobs : Array[RedactJobResult]
+  blocked : Int
+  warned : Int
+} derive(Eq, @debug.Debug)
+pub fn BatchReport::passed(Self) -> Bool
+pub fn BatchReport::to_json(Self) -> String
+
+pub(all) struct DetectorConfig {
+  min_token_length : Int
+  min_secret_length : Int
+  detect_ip : Bool
+} derive(Eq, @debug.Debug)
+pub fn DetectorConfig::default() -> Self
+
+pub(all) struct FieldFinding {
+  path : String
+  kind : SensitiveKind
+  present : Bool
+  redacted : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct FieldRule {
+  path : String
+  kind : SensitiveKind
+  required : Bool
+} derive(Eq, @debug.Debug)
+pub fn FieldRule::new(String, SensitiveKind, Bool) -> Self
+
+pub(all) struct FieldValue {
+  path : String
+  value : String
+} derive(Eq, @debug.Debug)
+pub fn FieldValue::new(String, String) -> Self
+
+pub(all) enum GateLevel {
+  Allow
+  Warn
+  Block
+} derive(Eq, @debug.Debug)
+pub fn GateLevel::name(Self) -> String
+
+pub(all) struct GateResult {
+  gate : String
+  level : GateLevel
+  reason : String
+  total : Int
+  high_risk : Int
+} derive(Eq, @debug.Debug)
+pub fn GateResult::allowed(Self) -> Bool
+pub fn GateResult::to_json(Self) -> String
+
+pub(all) struct LeakGate {
+  name : String
+  max_high_risk : Int
+  max_total : Int
+  block_secrets : Bool
+} derive(Eq, @debug.Debug)
+pub fn LeakGate::new(String, Int, Int, Bool) -> Self
+
+pub(all) enum MaskMode {
+  Full
+  KeepPrefixSuffix
+  HashLabel
+  Drop
+  Pass
+} derive(Eq, @debug.Debug)
+pub fn MaskMode::name(Self) -> String
+
+pub(all) struct RedactJob {
+  id : String
+  payload : String
+} derive(Eq, @debug.Debug)
+pub fn RedactJob::new(String, String) -> Self
+
+pub(all) struct RedactJobResult {
+  id : String
+  result : RedactResult
+  gate : GateResult
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RedactPolicy {
+  name : String
+  default_mode : MaskMode
+  rules : Array[RedactRule]
+  min_confidence_bp : Int
+  fail_closed : Bool
+} derive(Eq, @debug.Debug)
+pub fn RedactPolicy::accepts(Self, SensitiveMatch) -> Bool
+pub fn RedactPolicy::allow_ip() -> Self
+pub fn RedactPolicy::logs() -> Self
+pub fn RedactPolicy::new(String) -> Self
+pub fn RedactPolicy::rule_for(Self, SensitiveKind) -> RedactRule
+pub fn RedactPolicy::strict() -> Self
+
+pub(all) struct RedactResult {
+  input_length : Int
+  output : String
+  redactions : Array[Redaction]
+  skipped : Array[SensitiveMatch]
+} derive(Eq, @debug.Debug)
+pub fn RedactResult::changed(Self) -> Bool
+pub fn RedactResult::redaction_count(Self) -> Int
+pub fn RedactResult::risk_score_bp(Self) -> Int
+pub fn RedactResult::summary(Self) -> RedactSummary
+pub fn RedactResult::to_json(Self) -> String
+
+pub(all) struct RedactRule {
+  kind : SensitiveKind
+  mode : MaskMode
+  keep_prefix : Int
+  keep_suffix : Int
+  replacement : String
+} derive(Eq, @debug.Debug)
+pub fn RedactRule::new(SensitiveKind, MaskMode, Int, Int, String) -> Self
+
+pub(all) struct RedactSummary {
+  total : Int
+  email : Int
+  phone : Int
+  id_card : Int
+  bank_card : Int
+  token : Int
+  secret : Int
+  ip_address : Int
+  custom : Int
+} derive(Eq, @debug.Debug)
+pub fn RedactSummary::has_high_risk(Self) -> Bool
+pub fn RedactSummary::to_json(Self) -> String
+
+pub(all) struct Redaction {
+  original : SensitiveMatch
+  replacement : String
+} derive(Eq, @debug.Debug)
+
+pub(all) enum SensitiveKind {
+  Email
+  Phone
+  IdCard
+  BankCard
+  Token
+  Secret
+  IpAddress
+  Custom
+} derive(Eq, @debug.Debug)
+pub fn SensitiveKind::name(Self) -> String
+
+pub(all) struct SensitiveMatch {
+  kind : SensitiveKind
+  start : Int
+  end : Int
+  text : String
+  confidence_bp : Int
+  detector : String
+} derive(Eq, @debug.Debug)
+pub fn SensitiveMatch::length(Self) -> Int
+pub fn SensitiveMatch::new(SensitiveKind, Int, Int, String, Int, String) -> Self
+pub fn SensitiveMatch::to_json(Self) -> String
+
+// Type aliases
+
+// Traits
+
