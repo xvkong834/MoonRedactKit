@@ -8,7 +8,11 @@ import {
 // Values
 pub fn apply_mask(SensitiveMatch, RedactRule) -> String
 
+pub fn ci_secret_gate() -> LeakGate
+
 pub fn clamp_bp(Int) -> Int
+
+pub fn default_event_rules() -> Array[FieldRule]
 
 pub fn detect_all(String) -> Array[SensitiveMatch]
 
@@ -17,6 +21,10 @@ pub fn detect_with_config(String, DetectorConfig) -> Array[SensitiveMatch]
 pub fn evaluate_fields(Array[FieldValue], Array[FieldRule], RedactPolicy) -> Array[FieldFinding]
 
 pub fn evaluate_gate(LeakGate, RedactResult) -> GateResult
+
+pub fn explain_gate(GateResult) -> AuditLine
+
+pub fn explain_result(RedactResult) -> Array[AuditLine]
 
 pub fn is_alpha_char(Char) -> Bool
 
@@ -30,6 +38,8 @@ pub fn is_phone_separator(Char) -> Bool
 
 pub fn is_word_char(Char) -> Bool
 
+pub fn log_redaction_policy() -> RedactPolicy
+
 pub fn mask_keep_edges(String, Int, Int, String) -> String
 
 pub fn max_int(Int, Int) -> Int
@@ -37,6 +47,8 @@ pub fn max_int(Int, Int) -> Int
 pub fn min_int(Int, Int) -> Int
 
 pub fn missing_required_fields(Array[FieldFinding]) -> Int
+
+pub fn public_export_gate() -> LeakGate
 
 pub fn redact_matches(String, RedactPolicy, Array[SensitiveMatch]) -> RedactResult
 
@@ -55,6 +67,13 @@ pub fn summarize_matches(Array[SensitiveMatch]) -> RedactSummary
 // Errors
 
 // Types and methods
+pub(all) struct AuditLine {
+  code : String
+  message : String
+} derive(Eq, @debug.Debug)
+pub fn AuditLine::new(String, String) -> Self
+pub fn AuditLine::to_json(Self) -> String
+
 pub(all) struct BatchReport {
   jobs : Array[RedactJobResult]
   blocked : Int
