@@ -9,6 +9,8 @@ The project intentionally does not provide a log collector, storage engine, web
 service, or UI dashboard. Its scope is a small, portable decision core:
 
 - detect email, phone, ID card, bank card, token, secret marker, and IP address;
+- validate IPv4 octets before reporting network addresses, reducing false
+  positives in telemetry and access logs;
 - apply per-kind redaction policy with full mask, edge-preserving mask, hash
   label, drop, pass-through, and confidence threshold;
 - produce redaction summaries and gate decisions for CI or release pipelines;
@@ -50,3 +52,9 @@ moon info
 moon run cmd/main
 ```
 
+## License and compliance
+
+MoonRedactKit uses Apache License 2.0. The root [LICENSE](LICENSE) file contains
+the complete license text, [NOTICE](NOTICE) records the project notice, and
+[docs/OPEN_SOURCE_COMPLIANCE.md](docs/OPEN_SOURCE_COMPLIANCE.md) explains the
+review checklist and third-party code status.

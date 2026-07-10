@@ -300,7 +300,10 @@ fn append_ip_matches(matches : Array[SensitiveMatch], source : String) -> Unit {
           break
         }
       }
-      if dots == 3 && is_boundary(source, start - 1) && is_boundary(source, end) {
+      if dots == 3 &&
+        valid_ipv4_candidate(source, start, end) &&
+        is_boundary(source, start - 1) &&
+        is_boundary(source, end) {
         matches.push(
           SensitiveMatch::new(
             IpAddress,
@@ -316,6 +319,50 @@ fn append_ip_matches(matches : Array[SensitiveMatch], source : String) -> Unit {
     } else {
       i = i + 1
     }
+  }
+}
+
+///|
+fn valid_ipv4_candidate(source : String, start : Int, end : Int) -> Bool {
+  let mut parts = 1
+  let mut value = 0
+  let mut digits = 0
+  for i = start; i < end; i = i + 1 {
+    let ch = source.get_char(i).unwrap()
+    if is_digit_char(ch) {
+      value = value * 10 + digit_value(ch)
+      digits = digits + 1
+      if digits > 3 || value > 255 {
+        return false
+      }
+    } else if ch == '.' {
+      if digits == 0 {
+        return false
+      }
+      parts = parts + 1
+      value = 0
+      digits = 0
+    } else {
+      return false
+    }
+  }
+  parts == 4 && digits > 0
+}
+
+///|
+fn digit_value(ch : Char) -> Int {
+  match ch {
+    '0' => 0
+    '1' => 1
+    '2' => 2
+    '3' => 3
+    '4' => 4
+    '5' => 5
+    '6' => 6
+    '7' => 7
+    '8' => 8
+    '9' => 9
+    _ => 0
   }
 }
 

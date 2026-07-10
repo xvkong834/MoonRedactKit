@@ -16,6 +16,18 @@ test "detects id card bank card and ip" {
 }
 
 ///|
+test "accepts valid boundary ipv4 address" {
+  let summary = summarize_matches(detect_all("proxy 192.168.0.1 ready"))
+  assert_eq(summary.ip_address, 1)
+}
+
+///|
+test "rejects impossible ipv4 octets" {
+  let summary = summarize_matches(detect_all("bad 999.1.1.1 and 10.2.3.999"))
+  assert_eq(summary.ip_address, 0)
+}
+
+///|
 test "detects token and marked secret" {
   let text = "api_key=abcdef1234567890abcdef token abcdef1234567890abcdef12"
   let summary = summarize_matches(detect_all(text))
