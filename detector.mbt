@@ -129,7 +129,7 @@ fn append_id_card_matches(
       }
       let last = source.get_char(i + 17).unwrap()
       ok = ok && (is_digit_char(last) || last == 'X' || last == 'x')
-      if ok {
+      if ok && valid_id_card_checksum(source, i) {
         matches.push(
           SensitiveMatch::new(
             IdCard,
@@ -177,6 +177,7 @@ fn append_bank_card_matches(
       end = last_digit_end
       if digits >= 13 &&
         digits <= 19 &&
+        valid_luhn_candidate(source, start, end) &&
         is_boundary(source, start - 1) &&
         is_boundary(source, end) {
         matches.push(
@@ -364,6 +365,56 @@ fn digit_value(ch : Char) -> Int {
     '9' => 9
     _ => 0
   }
+}
+
+///|
+/// Validates the ISO/IEC 7812 check digit without retaining the card number.
+/// This removes a large class of numeric log fields that merely resemble cards.
+fn valid_luhn_candidate(source : String, start : Int, end : Int) -> Bool {
+  let mut sum = 0
+  let mut double_next = false
+  for i = end - 1; i >= start; i = i - 1 {
+    let ch = source.get_char(i).unwrap()
+    if is_digit_char(ch) {
+      let mut digit = digit_value(ch)
+      if double_next {
+        digit = digit * 2
+        if digit > 9 {
+          digit = digit - 9
+        }
+      }
+      sum = sum + digit
+      double_next = !double_next
+    }
+  }
+  sum % 10 == 0
+}
+
+///|
+/// Validates the checksum of an 18-digit Chinese resident identity number.
+/// Date and region validation deliberately remain an integration concern because
+/// applications may need historical or jurisdiction-specific rules.
+fn valid_id_card_checksum(source : String, start : Int) -> Bool {
+  let weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+  let mut sum = 0
+  for i = 0; i < 17; i = i + 1 {
+    sum = sum + digit_value(source.get_char(start + i).unwrap()) * weights[i]
+  }
+  let expected = match sum % 11 {
+    0 => '1'
+    1 => '0'
+    2 => 'X'
+    3 => '9'
+    4 => '8'
+    5 => '7'
+    6 => '6'
+    7 => '5'
+    8 => '4'
+    9 => '3'
+    _ => '2'
+  }
+  let provided = source.get_char(start + 17).unwrap()
+  provided == expected || (provided == 'x' && expected == 'X')
 }
 
 ///|

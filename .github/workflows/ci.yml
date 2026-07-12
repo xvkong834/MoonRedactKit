@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - master
   pull_request:
 
 jobs:
@@ -48,14 +49,12 @@ jobs:
         run: moon test --target all
 
       - name: Format check
-        run: |
-          moon fmt
-          git diff --exit-code
+        run: moon fmt --check
 
       - name: API metadata check
         run: |
           moon info
-          git diff --exit-code
+          git diff --exit-code -- '*.mbti'
 
       - name: Run CLI demo
         if: ${{ matrix.os == 'ubuntu-latest' }}

@@ -15,8 +15,27 @@ See [README.mbt.md](README.mbt.md) for the package-facing documentation.
   hash labels, drop, pass-through, and confidence thresholds.
 - Leak gates, batch reports, field-path evaluation, JSON export, CLI demo, and
   regression tests.
+- Chunk-safe streaming redaction for secrets split across log or exporter
+  buffers, plus Luhn and Chinese ID-card checksum validation to reduce false
+  positives in production telemetry.
+- A deterministic 100,000-chunk benchmark for bounded-memory log redaction.
 - GitHub Actions CI for `moon check`, `moon test`, `moon fmt`, `moon info`, and
   CLI execution.
+
+## Run the examples
+
+```bash
+moon run cmd/main
+moon run cmd/bench
+moon check --target all
+moon fmt --check
+moon info && git diff --exit-code -- '*.mbti'
+```
+
+The current MoonBit CLI uses `moon fmt --check` as its non-mutating format
+gate. It no longer accepts the older `moon fmt --deny-warn` or
+`moon info --deny-warn` arguments; CI therefore pairs the supported format
+check with `moon info` and a generated-interface diff.
 
 ## Compliance
 

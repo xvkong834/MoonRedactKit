@@ -17,6 +17,10 @@ service, or UI dashboard. Its scope is a small, portable decision core:
 - evaluate configured field paths for event schemas and log envelopes;
 - run batch redaction jobs with deterministic summaries;
 - export stable JSON for tools that need to review redaction results.
+- process arbitrary log chunks with `RedactionStream`, retaining unfinished
+  fields until they can be redacted safely;
+- validate bank-card Luhn digits and Chinese 18-digit ID-card checksums before
+  reporting a match.
 
 ```moonbit nocheck
 let result = redact_text(
@@ -47,9 +51,10 @@ checks are:
 ```bash
 moon check --target all
 moon test --target all
-moon fmt
-moon info
+moon fmt --check
+moon info && git diff --exit-code -- '*.mbti'
 moon run cmd/main
+moon run cmd/bench
 ```
 
 ## License and compliance

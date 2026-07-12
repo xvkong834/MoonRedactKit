@@ -7,12 +7,31 @@ test "detects email and phone" {
 }
 
 ///|
-test "detects id card bank card and ip" {
-  let text = "id 11010119900307123X card 6222021234567890123 ip 10.2.3.4"
+test "detects checksum-valid id card bank card and ip" {
+  let text = "id 11010519491231002X card 4532015112830366 ip 10.2.3.4"
   let summary = summarize_matches(detect_all(text))
   assert_eq(summary.id_card, 1)
   assert_eq(summary.bank_card, 1)
   assert_eq(summary.ip_address, 1)
+}
+
+///|
+test "rejects invalid id card and bank card check digits" {
+  let text = "id 110105194912310021 card 4532015112830367"
+  let summary = summarize_matches(detect_all(text))
+  assert_eq(summary.id_card, 0)
+  assert_eq(summary.bank_card, 0)
+}
+
+///|
+test "stream redaction keeps a split secret until it is safe" {
+  let stream = RedactionStream::new(RedactPolicy::strict(), retain_tail=16)
+  assert_eq(stream.push("level=info password=verysec"), "level=info ")
+  let stable = stream.push("retvalue123 user=alice ")
+  let tail = stream.finish()
+  assert_false((stable + tail).contains("verysecretvalue123"))
+  assert_true((stable + tail).contains("[SECRET]"))
+  assert_eq(stream.pending_length(), 0)
 }
 
 ///|
@@ -60,7 +79,7 @@ test "hash label is stable" {
 
 ///|
 test "summary marks high risk" {
-  let summary = summarize_matches(detect_all("card 6222021234567890123"))
+  let summary = summarize_matches(detect_all("card 4532015112830366"))
   assert_true(summary.has_high_risk())
 }
 

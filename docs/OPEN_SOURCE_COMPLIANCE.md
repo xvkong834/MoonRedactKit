@@ -22,8 +22,8 @@ materials are project-owned files created for this repository.
 Use the following commands before submission:
 
 ```bash
-moon fmt
-moon info
+moon fmt --check
+moon info && git diff --exit-code -- '*.mbti'
 moon check --target all
 moon test --target all
 moon package

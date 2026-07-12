@@ -1,0 +1,7 @@
+import {
+  "xvkong834/moonredactkit" @redact,
+}
+
+options(
+  "is-main": true,
+)

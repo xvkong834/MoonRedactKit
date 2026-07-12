@@ -10,6 +10,10 @@ fn main {
   println(result.output)
   println(result.to_json())
   println(gate.to_json())
+  let stream = @redact.RedactionStream::new(@redact.RedactPolicy::strict())
+  let first = stream.push("event=login password=verysec")
+  let second = stream.push("retvalue123 user=alice ")
+  println(first + second + stream.finish())
   let audit = @redact.summarize_matches(
     @redact.detect_all("card 6222021234567890123 ip 10.2.3.4"),
   )

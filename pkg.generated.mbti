@@ -209,6 +209,16 @@ pub(all) struct Redaction {
   replacement : String
 } derive(Eq, @debug.Debug)
 
+pub(all) struct RedactionStream {
+  policy : RedactPolicy
+  retain_tail : Int
+  mut pending : String
+} derive(@debug.Debug)
+pub fn RedactionStream::finish(Self) -> String
+pub fn RedactionStream::new(RedactPolicy, retain_tail? : Int) -> Self
+pub fn RedactionStream::pending_length(Self) -> Int
+pub fn RedactionStream::push(Self, String) -> String
+
 pub(all) enum SensitiveKind {
   Email
   Phone
